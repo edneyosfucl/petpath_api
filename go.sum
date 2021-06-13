@@ -1,0 +1,6 @@
+github.com/edneyosf/gloged v1.0.2 h1:uFmmuqlCVABv9wlafoVixsElfmgTqYz/b+xpNWqm79Y=
+github.com/edneyosf/gloged v1.0.2/go.mod h1:eJwVULVjUO1/zwEXLIXgKQ5NvsPr8L/5vEiqoms4gF4=
+github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfCHuOE=
+github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
+github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
+github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
