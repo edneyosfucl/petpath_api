@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	log "github.com/edneyosf/gloged"
 	_ "github.com/go-sql-driver/mysql"
@@ -28,6 +29,7 @@ func main() {
 
 	router.HandleFunc("/login", login).Methods("POST")
 	router.HandleFunc("/register", register).Methods("POST")
+	router.HandleFunc("/post", post).Methods("POST")
 
 	log.I(appName + " v" + version)
 	log.S("API iniciada na porta " + port)
@@ -84,6 +86,36 @@ func register(w http.ResponseWriter, r *http.Request) {
 			} else {
 				response.Message = "Falha ao registrar usuário"
 			}
+		}
+
+		json.NewEncoder(w).Encode(response)
+	}
+}
+
+// Para efetuar postagem pelo app
+func post(w http.ResponseWriter, r *http.Request) {
+	const method = "post"
+	post := Post{}
+
+	err := json.NewDecoder(r.Body).Decode(&post)
+
+	if err != nil {
+		log.Em(method, err.Error())
+		return
+	} else {
+		user := User{post.User, ""}
+		response := Response{false, "Falha ao efetuar postagem"}
+		exists, userId := userExists(user)
+
+		log.D(method, "post", fmt.Sprintf("%v", post))
+
+		if !exists {
+			if addPost(userId, post) {
+				response.Status = true
+				response.Message = "Postagem realizada com sucesso"
+			}
+		} else {
+			response.Message = "Usuário não encontrado"
 		}
 
 		json.NewEncoder(w).Encode(response)
@@ -166,11 +198,36 @@ func userExists(user User) (bool, int) {
 	return status, id
 }
 
+// Registra uma nova postagem
+func addPost(idUser int, post Post) bool {
+	status := true
+
+	_, err := database.Exec("INSERT INTO post (id_user, image, animal_name, description, location, checked, timestamp) VALUES (" + strconv.Itoa(idUser) + ", '" + post.Image + "', '" + post.AnimalName + "', '"+ post.Description +"', '"+ post.Location +"', "+ strconv.Itoa(post.Checked) +", "+ strconv.Itoa(post.Timestamp) +")")
+
+	if err != nil {
+		status = false
+		panic(err.Error())
+	}
+
+	return status
+}
+
 /* STRUCT */
 
 type User struct {
 	This     string `json:"user"`
 	Password string `json:"password"`
+}
+
+type Post struct {
+	Id    			int		 `json:"id"`
+	User				string `json:"user"`
+	Image 			string `json:"image"`
+	AnimalName	string `json:"animal_name"`
+	Description	string `json:"description"`
+	Location		string `json:"location"`
+	Checked			int `json:"checked"`
+	Timestamp 	int `json:"timestamp"`
 }
 
 type Response struct {
