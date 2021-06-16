@@ -109,7 +109,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 
 		log.D(method, "post", fmt.Sprintf("%v", post))
 
-		if !exists {
+		if exists {
 			if addPost(userId, post) {
 				response.Status = true
 				response.Message = "Postagem realizada com sucesso"
