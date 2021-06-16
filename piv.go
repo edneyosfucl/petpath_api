@@ -202,7 +202,7 @@ func userExists(user User) (bool, int) {
 func addPost(idUser int, post Post) bool {
 	status := true
 
-	_, err := database.Exec("INSERT INTO post (id_user, image, animal_name, description, location, checked, timestamp) VALUES (" + strconv.Itoa(idUser) + ", '" + post.Image + "', '" + post.AnimalName + "', '"+ post.Description +"', '"+ post.Location +"', "+ strconv.Itoa(post.Checked) +", "+ strconv.Itoa(post.Timestamp) +")")
+	_, err := database.Exec("INSERT INTO post (id_user, image, animal_name, description, location, timestamp) VALUES (" + strconv.Itoa(idUser) + ", '" + post.Image + "', '" + post.AnimalName + "', '"+ post.Description +"', '"+ post.Location +"', "+ strconv.Itoa(post.Timestamp) +")")
 
 	if err != nil {
 		status = false
