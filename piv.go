@@ -23,17 +23,46 @@ const nameDb = "pet_path"
 var database *sql.DB
 
 func main() {
-	connectToDb()
+	connectToDb()  // Conecta ao Banco
 	log.DebugMode = true
 	router := mux.NewRouter()
 
 	router.HandleFunc("/login", login).Methods("POST")
 	router.HandleFunc("/register", register).Methods("POST")
 	router.HandleFunc("/post", post).Methods("POST")
+	router.HandleFunc("/check", check).Methods("POST")
 
 	log.I(appName + " v" + version)
 	log.S("API iniciada na porta " + port)
 	log.E(http.ListenAndServe(":"+port, router).Error())
+}
+/*
+{
+	"id": 1,
+	"checked": 1
+}*/
+func check(w http.ResponseWriter, r *http.Request) {
+	const method = "check"
+	fmt.Println("aqui budega")
+	check := Check{}
+
+	err := json.NewDecoder(r.Body).Decode(&check)
+
+	if err != nil {
+		log.Em(method, err.Error())
+		return
+	} else {
+		response := Response{false, "fome"}
+		if postExists(check.Id) {
+			
+			response.Status = true
+			response.Message = "Post encontrado"
+		} else{
+			response.Message = "Post não encontrado"
+		}
+
+		json.NewEncoder(w).Encode(response)
+	}
 }
 
 /* REQUEST */
@@ -198,6 +227,32 @@ func userExists(user User) (bool, int) {
 	return status, id
 }
 
+// Verifica a existência de um post
+func postExists(id1 int) (bool) {
+	status := false
+	id := -1
+
+	results, err := database.Query("SELECT id_post FROM post WHERE id_post = " + strconv.Itoa(id1) + " LIMIT 1")
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	for results.Next() {
+		err = results.Scan(&id)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		if id != -1 {
+			status = true
+			break
+		}
+	}
+
+	return status
+}
+
 // Registra uma nova postagem
 func addPost(idUser int, post Post) bool {
 	status := true
@@ -233,4 +288,9 @@ type Post struct {
 type Response struct {
 	Status  bool   `json:"status"`
 	Message string `json:"message"`
+}
+
+type Check struct {
+	Id int `json:"id"`
+	Check int `json:"check"`
 }
