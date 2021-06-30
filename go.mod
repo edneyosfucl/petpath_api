@@ -1,4 +1,4 @@
-module piv
+module petpath
 
 go 1.16
 

@@ -36,11 +36,38 @@ func main() {
 	log.S("API iniciada na porta " + port)
 	log.E(http.ListenAndServe(":"+port, router).Error())
 }
-/*
-{
-	"id": 1,
-	"checked": 1
-}*/
+
+func feed(w http.ResponseWriter, r *http.Request){
+	posts := []Post{}
+	response := Response{false, "Falha ao efetuar operação"}
+
+	results, err := database.Query("SELECT * FROM post")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	for results.Next() {
+		id := -1
+		user := ""
+		image := ""
+		animalName := ""
+		description := ""
+		location := ""
+		checked := -1
+		timestamp := -1
+
+		err = results.Scan(&id, &user, &image, &image, &animalName, &description, &location, &checked, &timestamp)
+		if err != nil {
+			panic(err.Error())
+		} else{
+			post := Post{id, user, image, animalName, description, location, checked, timestamp}
+			posts = append(posts, post)
+		}
+	}
+
+	json.NewEncoder(w).Encode(response)
+}
+
 func check(w http.ResponseWriter, r *http.Request) {
 	const method = "check"
 	fmt.Println("aqui budega")
@@ -52,11 +79,14 @@ func check(w http.ResponseWriter, r *http.Request) {
 		log.Em(method, err.Error())
 		return
 	} else {
-		response := Response{false, "fome"}
+		response := Response{false, "Falha ao efetuar operação"}
 		if postExists(check.Id) {
-			
-			response.Status = true
-			response.Message = "Post encontrado"
+			status := setCheck(check.Id, check.Check)
+
+			if status {
+				response.Status = true
+				response.Message = "Sucesso"
+			} 
 		} else{
 			response.Message = "Post não encontrado"
 		}
@@ -258,6 +288,20 @@ func addPost(idUser int, post Post) bool {
 	status := true
 
 	_, err := database.Exec("INSERT INTO post (id_user, image, animal_name, description, location, checked, timestamp) VALUES (" + strconv.Itoa(idUser) + ", '" + post.Image + "', '" + post.AnimalName + "', '"+ post.Description +"', '"+ post.Location +"', "+ strconv.Itoa(-1)+" ,"+ strconv.Itoa(post.Timestamp) +")")
+
+	if err != nil {
+		status = false
+		panic(err.Error())
+	}
+
+	return status
+}
+
+// Altera o status de verificado
+func setCheck(idPost int, statusCheck int) bool {
+	status := true
+
+	_, err := database.Exec("UPDATE post SET checked = "+strconv.Itoa(statusCheck)+" WHERE id_post = "+strconv.Itoa(idPost))
 
 	if err != nil {
 		status = false
