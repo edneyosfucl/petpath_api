@@ -170,7 +170,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 		response := Response{false, "Falha ao efetuar postagem"}
 		exists, userId := userExists(user)
 
-		log.D(method, "post", fmt.Sprintf("%v", post))
+		log.D(method, "post", "")
 
 		if exists {
 			if addPost(userId, post) {
@@ -340,5 +340,5 @@ type Response struct {
 
 type Check struct {
 	Id int `json:"id"`
-	Check int `json:"check"`
+	Check int `json:"checked"`
 }
