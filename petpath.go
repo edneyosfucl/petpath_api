@@ -31,6 +31,7 @@ func main() {
 	router.HandleFunc("/register", register).Methods("POST")
 	router.HandleFunc("/post", post).Methods("POST")
 	router.HandleFunc("/check", check).Methods("POST")
+	router.HandleFunc("/feed", feed).Methods("GET");
 
 	log.I(appName + " v" + version)
 	log.S("API iniciada na porta " + port)
@@ -38,8 +39,10 @@ func main() {
 }
 
 func feed(w http.ResponseWriter, r *http.Request){
+	method := "feed"
 	posts := []Post{}
-	response := Response{false, "Falha ao efetuar operação"}
+
+	log.D(method, "feed", "")
 
 	results, err := database.Query("SELECT * FROM post")
 	if err != nil {
@@ -65,15 +68,16 @@ func feed(w http.ResponseWriter, r *http.Request){
 		}
 	}
 
-	json.NewEncoder(w).Encode(response)
+	log.D(method, "posts-size", strconv.Itoa(len(posts)))
+	json.NewEncoder(w).Encode(posts)
 }
 
 func check(w http.ResponseWriter, r *http.Request) {
 	const method = "check"
-	fmt.Println("aqui budega")
 	check := Check{}
 
 	err := json.NewDecoder(r.Body).Decode(&check)
+	log.D(method, "check", fmt.Sprintf("%v", check))
 
 	if err != nil {
 		log.Em(method, err.Error())
