@@ -44,7 +44,7 @@ func feed(w http.ResponseWriter, r *http.Request){
 
 	log.D(method, "feed", "")
 
-	results, err := database.Query("SELECT * FROM post")
+	results, err := database.Query("SELECT p.id_post, u.name_user, p.image, p.animal_name, p.description, p.location, p.checked, p.timestamp FROM post AS p JOIN user AS u ON p.id_user = u.id_user ORDER BY p.id_post DESC")
 	if err != nil {
 		panic(err.Error())
 	}
