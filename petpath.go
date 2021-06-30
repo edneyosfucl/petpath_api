@@ -59,7 +59,7 @@ func feed(w http.ResponseWriter, r *http.Request){
 		checked := -1
 		timestamp := -1
 
-		err = results.Scan(&id, &user, &image, &image, &animalName, &description, &location, &checked, &timestamp)
+		err = results.Scan(&id, &user, &image, &animalName, &description, &location, &checked, &timestamp)
 		if err != nil {
 			panic(err.Error())
 		} else{
